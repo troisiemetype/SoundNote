@@ -16,9 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+ /* Warning: this class uses dynamic memory allocation.
+  * Compiler won't warn you about using too much memory size.
+  * It's up to you to know that you don't overflow what can be used.
+  * Each note set occupies 6 bytes of memory, and the SoundNotes is 2 bytes per note, + 2.
+  * When adding or removing a note, you should have enough continguous memory to store a temp allocation of the table.
+  */
+
 #include "SoundNote.h"
 
 SoundNote::SoundNote(){
+	_pitch = 60;
+	_velocity = 80;
+	_wave = 0;
+	_env = 0;
 
 }
 
@@ -31,30 +42,88 @@ void SoundNote::stop(){
 }
 
 void SoundNote::setPitch(unsigned char pitch){
-
+	_pitch = pitch;
 }
 
 void SoundNote::setVelocity(unsigned char velocity){
-
+	_velocity = velocity;
 }
 
 void SoundNote::setWave(unsigned char wave){
-
+	_wave = wave;
 }
 
 void SoundNote::setEnv(unsigned char enveloppe){
-
+	_env = enveloppe;
 }
 
+unsigned char SoundNote::getPitch(){
+	return _pitch;
+}
+
+unsigned char SoundNote::getVelocity(){
+	return _velocity;
+}
+
+unsigned char SoundNote::getWave(){
+	return _wave;
+}
+
+unsigned char SoundNote::getEnv(){
+	return _env;
+}
 
 SoundNotes::SoundNotes(){
+	notes = NULL;
+	notesSize = 0;
 
 }
 
-void SoundNotes::addNote(SoundNote const& note){
-
+SoundNotes::~SoundNotes(){
+	free(notes);
 }
 
-void SoundNotes::removeNote(SoundNote const& note){
-	
+SoundNote* SoundNotes::getNote(int i){
+	return notes[i];
+}
+
+void SoundNotes::addNote(SoundNote* note){
+	notesSize++;
+	SoundNote **tmp = (SoundNote**)realloc(notes, sizeof(SoundNote) * notesSize);
+	if(tmp == NULL){
+		return;
+	}
+	notes = tmp;
+	notes[notesSize - 1] = note;
+}
+
+void SoundNotes::removeNote(SoundNote* note){
+	//decrement count of notes
+	notesSize--;
+
+	//If it's 0, then delete notes, as it's empty
+	if(notesSize == 0){
+		delete(notes);
+		return;
+	}
+
+	//Realloc the memory for the new table, verify it's ok.
+	SoundNote **tmp = (SoundNote**)realloc(notes, sizeof(SoundNote) * notesSize);
+	if(tmp == NULL){
+		return;
+	}
+
+	//Look for the note we want to suppress.
+	int top = notesSize + 1;
+	int count = 0;
+
+	for(int i = 0; i < top; i++){
+		//When found, skip copy.
+		if(notes[i] == note){continue;}
+		//Copy every other note from table to new memory location.
+		tmp[count] = notes[i];
+		count++;
+	}
+	//Then copy the temp table into it's new location. (exactly: make the table point on the new location)
+	notes = tmp;	
 }

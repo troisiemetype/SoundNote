@@ -19,6 +19,8 @@
 #ifndef SOUNDNOTE_H
 #define SOUNDNOTE_H
 
+#include <Arduino.h>
+
 class SoundNote{
 public:
 
@@ -33,6 +35,11 @@ public:
 	void setWave(unsigned char wave);
 	void setEnv(unsigned char enveloppe);
 
+	unsigned char getPitch();
+	unsigned char getVelocity();
+
+	unsigned char getWave();
+	unsigned char getEnv();
 
 protected:
 
@@ -53,11 +60,17 @@ class SoundNotes{
 public:
 
 	SoundNotes();
+	~SoundNotes();
 
-	void addNote(SoundNote const& note);
-	void removeNote(SoundNote const& note);
+	SoundNote* getNote(int i);
+
+	void addNote(SoundNote* note);
+	void removeNote(SoundNote* note);
 
 protected:
+
+	SoundNote **notes;
+	int notesSize;
 
 };
 
