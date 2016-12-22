@@ -19,17 +19,19 @@
  /* Warning: this class uses dynamic memory allocation.
   * Compiler won't warn you about using too much memory size.
   * It's up to you to know that you don't overflow what can be used.
-  * Each note set occupies 6 bytes of memory, and the SoundNotes is 2 bytes per note, + 2.
-  * When adding or removing a note, you should have enough continguous memory to store a temp allocation of the table.
+  * Each note set occupies 6 bytes of memory, and SoundNotes is 2 bytes per note, + 2.
+  * When adding or removing a note, you should have enough contiguous memory to store a temp allocation of the table.
   */
 
 #include "SoundNote.h"
 
 SoundNote::SoundNote(){
 	_pitch = 60;
-	_velocity = 80;
+	_velocity = 100;
 	_wave = 0;
 	_env = 0;
+
+	_stepPlay = 0;
 
 }
 
@@ -73,6 +75,25 @@ unsigned char SoundNote::getEnv(){
 	return _env;
 }
 
+void SoundNote::setStep(byte step){
+	setBit(_stepPlay, step);
+}
+
+void SoundNote::clearStep(byte step){
+	clearBit(_stepPlay, step);
+}
+
+void SoundNote::toggleStep(byte step){
+	toggleBit(_stepPlay, step);
+}
+
+bool SoundNote::getStep(byte step){
+	return _stepPlay & (1 << step);
+}
+
+
+
+
 SoundNotes::SoundNotes(){
 	notes = NULL;
 	notesSize = 0;
@@ -85,6 +106,10 @@ SoundNotes::~SoundNotes(){
 
 SoundNote* SoundNotes::getNote(int i){
 	return notes[i];
+}
+
+byte SoundNotes::getNotes(){
+	return notesSize;
 }
 
 void SoundNotes::addNote(SoundNote* note){

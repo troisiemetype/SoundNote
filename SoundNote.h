@@ -21,6 +21,11 @@
 
 #include <Arduino.h>
 
+#define setBit(value, bit)			(value |= (1 << bit))
+#define clearBit(value, bit)		(value &= ~(1 << bit))
+#define toggleBit(value, bit)			(value ^= (1 << bit))
+#define isBit(value, bit) 			((value >> bit) & 0x1)
+
 class SoundNote{
 public:
 
@@ -41,6 +46,11 @@ public:
 	unsigned char getWave();
 	unsigned char getEnv();
 
+	void setStep(byte step);
+	void clearStep(byte step);
+	void toggleStep(byte step);
+	bool getStep(byte step);
+
 protected:
 
 	unsigned char _pitch;
@@ -53,6 +63,8 @@ protected:
 
 	bool _isPlaying;
 
+	unsigned long _stepPlay;
+
 
 };
 
@@ -63,6 +75,7 @@ public:
 	~SoundNotes();
 
 	SoundNote* getNote(int i);
+	byte getNotes();
 
 	void addNote(SoundNote* note);
 	void removeNote(SoundNote* note);
